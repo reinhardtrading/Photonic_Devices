@@ -1,0 +1,76 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Mon May 25 22:57:33 2020
+
+@author: bonhardt
+"""
+import numpy as np
+import fd
+import matplotlib.pyplot as plt
+
+deltaepssilon = 0.08;
+V=2.405
+a =1.5
+na=np.sqrt(deltaepssilon)
+wl=(2*np.pi*a*na)/V
+ncl=ncl=np.sqrt(fd.sellmeier(wl))
+nc=np.sqrt(deltaepssilon+ncl**2)
+print("The refractive index of the core is", nc)
+print("The cut-off wavelength is", wl)
+
+ncl=np.sqrt(fd.sellmeier(1.55))
+nc=np.sqrt(deltaepssilon+ncl**2)
+eps,wid=fd.epssif_tav(15,0.2,a,nc,ncl)
+neff,hx,hy=fd.solve(1.55,eps,wid,1,nc,1,1)
+neff1=neff
+
+
+
+ncl=np.sqrt(fd.sellmeier(1.551))
+nc=np.sqrt(deltaepssilon+ncl**2)
+eps,wid=fd.epssif_tav(15,0.2,a,nc,ncl)
+neff,hx,hy=fd.solve(1.551,eps,wid,1,nc,1,1)
+neff2=neff
+#print ("neff2: ")
+#print (neff2)
+
+ncl=np.sqrt(fd.sellmeier(1.549))
+nc=np.sqrt(deltaepssilon+ncl**2)
+eps,wid=fd.epssif_tav(15,0.2,a,nc,ncl)
+neff,hx,hy=fd.solve(1.549,eps,wid,1,nc,1,1)
+neff0=neff
+
+D=(-1.55*(neff2+neff0-2*neff1))/(((0.001)**2)*2.99792e8)*1e12
+print ("D is: ")
+print (D)
+
+
+na=(2.405*wl)/(2*np.pi*a)
+deps=pow(na,2)
+print("depsilon:",deps)
+width=15
+dx=0.2
+a=1.5
+wl=1.55
+dwl=0.001
+c=2.99792e8
+n=0
+neff=np.zeros(5)
+wavelength = [wl-2*dwl,wl-dwl,wl,wl+dwl,wl+2*dwl]
+for i in wavelength:
+ ncl=np.sqrt(fd.sellmeier(i))
+ nc=np.sqrt(pow(ncl,2)+deps)
+ eps, wid = fd.epssif_tav(width, dx, a, nc, ncl)
+ neff[n], hx, hy = fd.solve(i, eps, wid, 1, nc, 1, 1)
+ n +=1
+D=((-wl/c)*(neff[3]+neff[1]-2*neff[2])/pow(dwl,2))*1e12
+print("D: ",D)
+D1=((-(wl+dwl)/c)*(neff[4]+neff[2]-2*neff[3])/pow(dwl,2))*1e12
+print("D1: ",D1)
+D2=((-(wl-dwl)/c)*(neff[2]+neff[0]-2*neff[1])/pow(dwl,2))*1e12
+print("D2: ",D2)
+S=((D1-D2)/(2*dwl))*1e-3
+print("Slope: ",S) 
+
+
